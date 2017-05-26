@@ -18,7 +18,8 @@ The Server side application which Harvest the NEWS realised by Industry & Market
 * Language : Java (JDK 1.8)
 * Database : MongoDB
 * How to run : Run as Spring Boot Application
-* Deployment instructions
+* Deployment instructions 
+* Browser : Chrome(Must required)
 
 ### Who do I talk to? ###
 
