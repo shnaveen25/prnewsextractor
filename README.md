@@ -7,8 +7,7 @@ The Server side application which Harvest the NEWS realised by Industry & Market
 ### What is this repository for? ###
 
 * Quick summary : 
-     **PR Newswire** is a distributor of press releases based in New York City. By PR Newswire we can find news by industry or search for the topics that matter.
- 
+     **PR Newswire** is a distributor of press releases based in New York City. By PR Newswire we can find news by industry or search for the topics that matter. In the current application we harvested the **News Releases by Industry & Markets** their are many categories as I chosen one. I used MongoDb to store the harvested data. 
 
 * Harvest Data From : [PR News Wire](http://www.prnewswire.com/rss/)
 
@@ -23,6 +22,6 @@ The Server side application which Harvest the NEWS realised by Industry & Market
 
 ### Who do I talk to? ###
 
-* Repo owner or admin : Naveen S Heroorkat
+* Repo owner or admtn : Naveen S Heroorkar
 * Email : sh.naveen16@gmail.com
 * Phone : 9886239696
