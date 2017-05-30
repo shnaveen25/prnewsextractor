@@ -9,7 +9,7 @@ import com.mongodb.MongoClient;
 
 public final class ZinnovAdminPortalClient {
 
-	private static MongoClient mongoClient;
+	private static final Logger logger = LoggerFactory.getLogger(ZinnovAdminPortalClient.class);
 
 	private static final String MONGO_HOST = "127.0.0.1";
 
@@ -17,30 +17,44 @@ public final class ZinnovAdminPortalClient {
 
 	private static final String MONGO_ZINNOV_DB = "ZinnovAdminPortal";
 
-	private static final Logger logger = LoggerFactory.getLogger(ZinnovAdminPortalClient.class);
+	private static MongoClient mongoClient;
 
-	private ZinnovAdminPortalClient() {
-
+	public static void closeMongoClient(){
+		
+		if(mongoClient == null){
+			logger.warn("Trying to close mongo which hassent been instantiated");
+			
+			return;
+		}
+		
+		logger.info("Mongo client has been terminated");
+		mongoClient.close();
+		return;
 	}
 
 	/**
-	 * The static method user to instantiate the mongo connection
 	 * 
-	 * @author naveen 
+	 * @author naveen
+	 * @param collecionName
 	 * @return
+	 * 
 	 */
-	public static MongoClient getMongoClient() {
-		if (mongoClient != null) {
-			return mongoClient;
+	public static DBCollection getCollection(String collecionName){
+		DB database  = getDatabase();
+		
+		if(database == null){
+			logger.error("No database found");
+			return null;
 		}
-		try {
-			mongoClient = new MongoClient(MONGO_HOST, MONGO_PORT);
-			logger.info("Mongo client has been instantiated");
-		} catch (Exception e) {
-			logger.error("Error while instantiating mongo client", e);
+		
+		DBCollection collection = null;
+		
+		try{
+			collection = database.getCollection(collecionName);
+		}catch (Exception e) {
+			logger.error("Error while instantiating mongo collection", e);
 		}
-
-		return mongoClient;
+		return collection;
 	}
 	
 	
@@ -72,40 +86,26 @@ public final class ZinnovAdminPortalClient {
 	}
 	
 	/**
+	 * The static method user to instantiate the mongo connection
 	 * 
-	 * @author naveen
-	 * @param collecionName
+	 * @author naveen 
 	 * @return
-	 * 
 	 */
-	public static DBCollection getCollection(String collecionName){
-		DB database  = getDatabase();
-		
-		if(database == null){
-			logger.error("No database found");
-			return null;
+	public static MongoClient getMongoClient() {
+		if (mongoClient != null) {
+			return mongoClient;
 		}
-		
-		DBCollection collection = null;
-		
-		try{
-			collection = database.getCollection(collecionName);
-		}catch (Exception e) {
-			logger.error("Error while instantiating mongo collection", e);
+		try {
+			mongoClient = new MongoClient(MONGO_HOST, MONGO_PORT);
+			logger.info("Mongo client has been instantiated");
+		} catch (Exception e) {
+			logger.error("Error while instantiating mongo client", e);
 		}
-		return collection;
+
+		return mongoClient;
 	}
 	
-	public static void closeMongoClient(){
-		
-		if(mongoClient == null){
-			logger.warn("Trying to close mongo which hassent been instantiated");
-			
-			return;
-		}
-		
-		logger.info("Mongo client has been terminated");
-		mongoClient.close();
-		return;
+	private ZinnovAdminPortalClient() {
+
 	}
 }

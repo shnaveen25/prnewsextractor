@@ -10,7 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +29,20 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 
 	private static final Logger logger = LoggerFactory.getLogger(NewsReleasesdustryMarketsServImpl.class);
 
-	String url = "http://www.prnewswire.com/rss/";
-	String webUrl = "http://www.prnewswire.com";
-
 	WebDriver chromeDriver = null;
-
 	@Autowired
 	private RSSNewsFeedService rssNewsFeedService;
+
+	String url = "http://www.prnewswire.com/rss/";
+
+	String webUrl = "http://www.prnewswire.com";
 
 	@Override
 	public void extractCalssRelatedNews() {
 		
 		logger.info("Harvesting the data from " + url);
 
-		chromeDriver = new ChromeDriver();
+		chromeDriver = new HtmlUnitDriver();
 		chromeDriver.get(url);
 
 		WebElement table = chromeDriver.findElement(By.tagName("table"));
@@ -53,19 +53,23 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 			if (industry.get(i).getText().equals(GlobalConstants.NEWS_REL_BY_IND_MAR)) {
 				i++;
 				while (!industry.get(i).getText().equals(GlobalConstants.PHOTO)) {
-					String industryName = industry.get(i).getText();
-					logger.info("The Industry Name :" + industryName);
+						String industryName = industry.get(i).getText();
+						logger.info("The Industry Name :" + industryName);
+						
+						getRSSLink(industry.get(i), industryName);
+						
+						industry.get(i).click();	
+	
+						List<WebElement> subIndustry = industry.get(i).findElements(By.tagName("p"));
+						logger.info("The industry having :" + subIndustry.size() + ": No of sub industries");
 					
-					getRSSLink(industry.get(i), industryName);
+						//Each industry runs in seperatethread
+						new Thread(() -> {	
+							for (WebElement eachSubIndustry : subIndustry) {
+								getRSSLink(eachSubIndustry, industryName);
+							}
+						}).start();
 					
-					industry.get(i).click();
-
-					List<WebElement> subIndustry = industry.get(i).findElements(By.tagName("p"));
-					logger.info("The industry having :" + subIndustry.size() + ": No of sub industries");
-				
-					for (WebElement eachSubIndustry : subIndustry) {
-						getRSSLink(eachSubIndustry, industryName);
-					}
 					i++;
 				}
 			}
@@ -79,12 +83,13 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 		if (linkButton.size() > 0) {
 			String link = linkButton.get(0).getAttribute("onclick").split("=")[1];
 			String rssLink = (webUrl + link.substring(1, link.length() - 1));
-
-			try {
-				readUrlofXmlLink(industryName, rssLink);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		
+				try {
+					readUrlofXmlLink(industryName, rssLink);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+		
 		}
 	}
 
@@ -110,20 +115,16 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 			extractedData.setGuid(element.getElementsByTagName("guid").item(0).getTextContent());
 			extractedData.setPubDate(element.getElementsByTagName("pubDate").item(0).getTextContent());
 			String description = "";
-			
-			/*String selectLinkOpeninNewTab = Keys.chord(Keys.CONTROL,Keys.RETURN); 
-			chromeDriver.findElement(By.linkText("www.google.com")).sendKeys(selectLinkOpeninNewTab);
-			*/
-			
-			WebDriver tempChromeDriver = new ChromeDriver();
+				
+			WebDriver tempChromeDriver = new HtmlUnitDriver();
 			tempChromeDriver.get(extractedData.getLink());
-			
+					
 			WebElement releaserBody = tempChromeDriver.findElement(By.className("release-body"));
 			List<WebElement> descRow = releaserBody.findElements(By.className("row"));
 			for (WebElement eachRow : descRow) {
 				description += eachRow.getText();
 			}
-
+			
 			logger.info("SUB IND NAME : " + extractedData.getSubIndName());
 			logger.info("LINK : " + extractedData.getLink());
 			
@@ -134,7 +135,9 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 
 			tempChromeDriver.close();
 			
-			rssNewsFeedService.saveExtractedDate(extractedData);
+			//new Thread(() -> {			
+				rssNewsFeedService.saveExtractedDate(extractedData);			
+			//}).start();
 		}
 	}
 }

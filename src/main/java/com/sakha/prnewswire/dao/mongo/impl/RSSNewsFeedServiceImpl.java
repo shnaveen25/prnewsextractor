@@ -18,9 +18,9 @@ import com.sakha.prnewswire.util.ZinnovAdminPortalClient;
 @Repository("RSSNewsFeedService")
 public class RSSNewsFeedServiceImpl implements RSSNewsFeedService {
 
-	public DBCollection dbCollection;
-
 	private static final Logger logger = LoggerFactory.getLogger(RSSNewsFeedServiceImpl.class);
+
+	public DBCollection dbCollection;
 
 	public RSSNewsFeedServiceImpl() {
 		this.dbCollection = ZinnovAdminPortalClient.getCollection(COLLECTION);
@@ -65,7 +65,7 @@ public class RSSNewsFeedServiceImpl implements RSSNewsFeedService {
 				JSONArray subInds = new JSONArray();
 				subInds.put(subIndustryObj);
 				
-				logger.info("The Updated subInd and to be saved is : "+subInds);
+				//logger.info("The Updated subInd and to be saved is : "+subInds);
 				
 				sourceObj.put("subIndustries", subInds);
 				
@@ -76,23 +76,21 @@ public class RSSNewsFeedServiceImpl implements RSSNewsFeedService {
 				
 				
 				dbCollection.insert(curser);
-				logger.info("Data has been inserted/modified on : "+currentDate);
+				//logger.info("Data has been inserted/modified on : "+currentDate);
 			}
 			else{ 
 				
 				JSONObject sourceObj =  new JSONObject(curser.toString());
 				JSONArray subInds = sourceObj.getJSONArray("subIndustries");
 				
-				
-				
-				logger.info("The subInd from Collection :"+subInds);
+				//logger.info("The subInd from Collection :"+subInds);
 				
 				subInds.put(subIndustryObj);
 				
 				sourceObj =  new JSONObject();
 				sourceObj.put("subIndustries", subInds);
 				
-				logger.info("The Updated subInd and to be saved is : "+subInds);
+				//logger.info("The Updated subInd and to be saved is : "+subInds);
 				
 				Object o = com.mongodb.util.JSON.parse(sourceObj.toString());
 				DBObject tobeStoredSubInd = (DBObject) o;
