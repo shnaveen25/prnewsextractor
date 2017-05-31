@@ -37,6 +37,8 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 
 	String webUrl = "http://www.prnewswire.com";
 
+	int i = 0;
+	
 	@Override
 	public void extractCalssRelatedNews() {
 		
@@ -47,8 +49,9 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 
 		WebElement table = chromeDriver.findElement(By.tagName("table"));
 		List<WebElement> industry = table.findElements(By.xpath("//tbody/tr"));
-
-		for (int i = 0; i < industry.size(); i++) {
+		
+		
+		for (i = 0; i < industry.size(); i++) {
 
 			if (industry.get(i).getText().equals(GlobalConstants.NEWS_REL_BY_IND_MAR)) {
 				i++;
@@ -56,7 +59,9 @@ public class NewsReleasesdustryMarketsServImpl implements NewsReleasesdustryMark
 						String industryName = industry.get(i).getText();
 						logger.info("The Industry Name :" + industryName);
 						
-						getRSSLink(industry.get(i), industryName);
+						new Thread(() -> {	
+							getRSSLink(industry.get(i), industryName);
+						}).start();
 						
 						industry.get(i).click();	
 	
