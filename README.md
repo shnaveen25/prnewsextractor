@@ -20,9 +20,3 @@ The Server side application which Harvest the NEWS realised by Industry & Market
 * How to run : Run as Spring Boot Application
 * Deployment instructions 
 * Browser : Chrome(Must required)
-
-### Who do I talk to? ###
-
-* Repo owner or admtn : Naveen S Heroorkar
-* Email : sh.naveen16@gmail.com
-* Phone : 9886239696
